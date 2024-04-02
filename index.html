@@ -12,19 +12,21 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 mt-5">
-                <input type="text" class="form-control form-control-lg rounded-1 zip_city" name="" placeholder="ZIP or City" autocomplete="off">
+                <input type="text" class="form-control form-control-lg rounded-1" name="zip_city"
+                    placeholder="ZIP or City" autocomplete="off">
             </div>
         </div>
     </div>
 
     <script>
-        var inputs = document.querySelectorAll('.zip_city');
+        // Select all input fields with the name 'zip_city'
+        var inputs = document.querySelectorAll('input[name="zip_city"]');
 
         inputs.forEach(function (input) {
             input.addEventListener('input', function () {
                 var inputVal = this.value.toLowerCase();
                 if (inputVal.length > 0) {
-                    fetch('https://raw.githubusercontent.com/hasan4flf/california/main/cities.json') // Replace with your actual JSON file URL
+                    fetch('https://raw.githubusercontent.com/hasan4flf/california/main/cities.json')
                         .then(response => response.json())
                         .then(data => {
                             let matches;
