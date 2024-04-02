@@ -13,7 +13,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6 mt-5">
                 <input type="text" class="form-control form-control-lg rounded-1" name="" id="cityInput"
-                    placeholder="ZIP or City">
+                    placeholder="ZIP or City" autocomplete="off">
                 <div id="suggestionBox" class="suggestions"></div>
             </div>
         </div>
@@ -23,7 +23,7 @@
         document.getElementById('cityInput').addEventListener('input', function () {
             var inputVal = this.value.toLowerCase();
             if (inputVal.length > 0) {
-                fetch('cities.json') // Replace with your actual JSON file URL
+                fetch('https://raw.githubusercontent.com/hasan4flf/california/main/cities.json')
                     .then(response => response.json())
                     .then(data => {
                         let matches;
