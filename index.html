@@ -19,28 +19,31 @@
     </div>
 
     <script>
-        // Select all input fields with the name 'zip_city'
-        var inputs = document.querySelectorAll('input[name="zip_city"]');
-
-        inputs.forEach(function (input) {
+        document.querySelectorAll('input[name="zip_city"]').forEach(function (input) {
             input.addEventListener('input', function () {
                 var inputVal = this.value.toLowerCase();
                 if (inputVal.length > 0) {
                     fetch('https://raw.githubusercontent.com/hasan4flf/california/main/cities.json')
                         .then(response => response.json())
                         .then(data => {
-                            let matches;
-                            if (isNaN(inputVal)) { // If the input is not a number, assume it's a city name
-                                // Filter by city name and remove duplicates
-                                matches = data.filter((item, index, self) =>
-                                    self.findIndex(t => t.city === item.city && t.state === item.state) === index &&
-                                    item.city.toLowerCase().startsWith(inputVal)
-                                );
-                            } else { // If the input is a number, assume it's a ZIP code
-                                // Filter by ZIP code
-                                matches = data.filter(item => item.zip.startsWith(inputVal));
-                            }
-
+                            let uniqueResults = new Map(); // A map to track unique results
+                            data.forEach(item => {
+                                let label, value;
+                                if (isNaN(inputVal)) { // Assuming a city name search
+                                    label = `${item.city}, ${item.state}`;
+                                    value = label; // For city searches, value and label are the same
+                                } else { // Assuming a ZIP code search
+                                    label = `${item.city}, ${item.state} ${item.zip}`;
+                                    value = label; // Include ZIP code in value for ZIP searches
+                                }
+                                if (item.city.toLowerCase().startsWith(inputVal) || item.zip.startsWith(inputVal)) {
+                                    if (!uniqueResults.has(label)) { // Prevent duplicates
+                                        uniqueResults.set(label, value);
+                                    }
+                                }
+                            });
+                            // Convert Map to array of objects for display
+                            let matches = Array.from(uniqueResults, ([label, value]) => ({ label, value }));
                             displaySuggestions(matches, input);
                         }).catch(error => console.error('Error fetching the data:', error));
                 } else {
@@ -51,37 +54,34 @@
 
         function displaySuggestions(matches, input) {
             closeAllLists();
-            var suggestionBox = document.createElement("div");
+            let suggestionBox = document.createElement("div");
             suggestionBox.setAttribute("class", "autocomplete-items");
             input.parentNode.appendChild(suggestionBox);
+
             matches.forEach(function (item) {
-                var div = document.createElement("div");
-                // Adjust displayed info based on whether a ZIP code or city name was entered
-                var displayText = isNaN(input.value) ?
-                    `${item.city}, ${item.state}` :
-                    `${item.city}, ${item.state} ${item.zip}`;
-                div.innerHTML = displayText;
+                let div = document.createElement("div");
+                div.innerHTML = item.label;
                 div.addEventListener("click", function () {
-                    input.value = this.innerHTML;
+                    input.value = item.value;
                     closeAllLists();
                 });
                 suggestionBox.appendChild(div);
             });
         }
 
-        function closeAllLists(elmnt) {
+        function closeAllLists() {
             var x = document.getElementsByClassName("autocomplete-items");
             for (var i = 0; i < x.length; i++) {
-                if (elmnt != x[i] && elmnt != inputs) {
-                    x[i].parentNode.removeChild(x[i]);
-                }
+                x[i].parentNode.removeChild(x[i]);
             }
         }
 
         // Close the list when someone clicks in the document
         document.addEventListener("click", function (e) {
-            closeAllLists(e.target);
+            closeAllLists();
         });
+
+
     </script>
 </body>
 
