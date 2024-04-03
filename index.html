@@ -20,6 +20,9 @@
 
     <script>
         document.querySelectorAll('input[name="zip_city"]').forEach(function (input) {
+            // Disable autocomplete for each input field
+            input.setAttribute('autocomplete', 'off');
+            
             input.addEventListener('input', function () {
                 var inputVal = this.value.toLowerCase();
                 if (inputVal.length > 0) {
